@@ -131,5 +131,6 @@ const Canvas = styled.canvas`
 `
 
 const Input = styled.input`
+  display: block;
   margin-bottom: 16px;
 `
