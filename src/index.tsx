@@ -1,8 +1,9 @@
 import { h, render } from 'preact'
+import { AutoLayoutText } from './AutoLayoutText'
 
 const Main = () => {
   return (
-    <div>auto text layout</div>
+    <AutoLayoutText />
   )
 }
 
