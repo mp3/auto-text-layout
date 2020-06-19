@@ -4,6 +4,8 @@ import styled from 'styled-components'
 
 const width = 1200
 const height = 630
+const fontSize = 42
+const lineHeight = fontSize * 1.25
 
 export const AutoLayoutText = () => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
@@ -20,11 +22,41 @@ export const AutoLayoutText = () => {
     if (context) {
       context.clearRect(0, 0, width, height)
       context.beginPath()
-      context.font = 'bold 16px sans-serif'
-      const textMeasurement = context.measureText(text)
-      const x = (width - textMeasurement.width) / 2
-      const y = height / 2
-      context.fillText(text, x, y, width)
+      context.font = `bold ${fontSize}px sans-serif`
+
+      const singleLineMeasurement = context.measureText(text)
+      
+      const possiblyOverflow = singleLineMeasurement.width > width - 200
+      
+      if (possiblyOverflow) {
+        const texts = text
+          .replace(/([^，．、。\s]+[，．、。\s]){2}/, '$&\n')
+          .split('\n')
+          .filter((text) => text !== '')
+
+        const maxLengthText = [...texts]
+          .sort((a, b) => b.length - a.length)
+          .find((_text, index) => index === 0)
+
+        if (maxLengthText === undefined) {
+          return
+        }
+
+        const maxLengthMeasurement = context.measureText(maxLengthText)
+        const x = (width - maxLengthMeasurement.width) / 2
+        const y = height / 2
+
+        texts.forEach((text, index) => {
+          const lineLength = texts.length
+          const distance = index - lineLength / 2
+          const offsetY = y + lineHeight * distance
+          context.fillText(text, x, offsetY, width)
+        })
+      } else {
+        const x = (width - singleLineMeasurement.width) / 2
+        const y = height / 2
+        context.fillText(text, x, y, width)
+      }
     }
   }, [context, text])
 
@@ -35,7 +67,7 @@ export const AutoLayoutText = () => {
 
   return (
     <Container>
-      <Input onInput={onInputText} />
+      <Input onInput={onInputText} autoFocus={true} />
       <Canvas ref={canvasRef} />
     </Container>
   )
@@ -47,8 +79,9 @@ const Container = styled.div`
 const Canvas = styled.canvas`
   width: 1200px;
   height: 630px;
+  border: 1px solid #ccc;
 `
 
 const Input = styled.input`
-
+  margin-bottom: 16px;
 `
