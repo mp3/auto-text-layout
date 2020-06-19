@@ -16,6 +16,14 @@ const splitByDelimiter = (text: string, position: number) => {
     .filter((text) => text !== '')
 }
 
+const sortByLength = (texts: string[]) => {
+  return [...texts].sort((a, b) => b.length - a.length)
+}
+
+const getMaxLengthText = (texts: string[]) => {
+  return sortByLength(texts).find((_text, index) => index === 0)
+}
+
 export const AutoLayoutText = () => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   const [text, setText] = useState<string>('')
@@ -39,10 +47,7 @@ export const AutoLayoutText = () => {
       
       if (possiblyOverflow) {
         const texts = splitByDelimiter(text, 2)
-
-        const maxLengthText = [...texts]
-          .sort((a, b) => b.length - a.length)
-          .find((_text, index) => index === 0)
+        const maxLengthText = getMaxLengthText(texts)
 
         if (maxLengthText === undefined) {
           return
