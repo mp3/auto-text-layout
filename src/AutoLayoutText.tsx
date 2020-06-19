@@ -5,7 +5,7 @@ import styled from 'styled-components'
 const width = 1200
 const height = 630
 const paddingWidth = 200
-const fontSize = 42
+const fontSize = 50
 const lineHeight = fontSize * 1.25
 
 const splitByDelimiter = (text: string, position: number) => {
@@ -46,7 +46,7 @@ const autoSplitStringArray = (context: CanvasRenderingContext2D, texts: string[]
   return texts.map((text) => autoSplit(context, text)).flat()
 }
 
-const sortByLength = (texts: string[]) => {
+const sortByLength = (texts: string | any[]) => {
   return [...texts].sort((a, b) => b.length - a.length)
 }
 
@@ -56,6 +56,25 @@ const getMaxLengthText = (texts: string[]) => {
 
 const checkOverflow = (measurement: TextMetrics) => {
   return measurement.width > width - paddingWidth
+}
+
+const getTextArray = (context: CanvasRenderingContext2D, text: string, returnPosition: number) => {
+  return autoSplitStringArray(context, splitByDelimiter(text, returnPosition))
+}
+
+const scoreCandidates = (texts: string[][]) => {
+  const sortedByLength = [...sortByLength(texts)].reverse() as string[][]
+  const minLength = Math.min(...(sortedByLength.map((element) => element.length)))
+  const filteredByMinLength = sortedByLength.filter((element) => element.length <= minLength)
+
+  if (filteredByMinLength.length > 1) {
+    return [...filteredByMinLength]
+      .sort((a, b) => a[0].length - b[0].length)
+      .find((_element, index) => index === 0)
+      ?? filteredByMinLength[0]
+  }
+
+  return filteredByMinLength.find((_element, index) => index === 0) ?? filteredByMinLength[0]
 }
 
 export const AutoLayoutText = () => {
@@ -80,7 +99,12 @@ export const AutoLayoutText = () => {
 
 
       if (possiblyOverflow) {
-        const texts = autoSplitStringArray(context, splitByDelimiter(text, 2))
+        const candidates = [...Array(3)].map((_element, index) => {
+          return getTextArray(context, text, index + 1)
+        })
+
+
+        const texts = scoreCandidates(candidates)
         const maxLengthText = getMaxLengthText(texts)
 
         if (maxLengthText === undefined) {
