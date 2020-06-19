@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 const width = 1200
 const height = 630
+const paddingWidth = 200
 const fontSize = 42
 const lineHeight = fontSize * 1.25
 
@@ -16,12 +17,45 @@ const splitByDelimiter = (text: string, position: number) => {
     .filter((text) => text !== '')
 }
 
+const autoSplit = (context: CanvasRenderingContext2D, text: string): string | string[] => {
+  const measurement = context.measureText(text)
+  const possiblyOverflow = checkOverflow(measurement)
+
+  if (possiblyOverflow) {
+    const splittedText = text.split('')
+    let array: string[] = []
+
+    for (const text of splittedText) {
+      const joinedText = `${array.join('')}${text}`
+      const currentMeasurement = context.measureText(joinedText)
+      const overflow = checkOverflow(currentMeasurement)
+      if (overflow === false) {
+        array = [...array, text]
+      }
+    }
+
+    const remainingText = splittedText.filter((_text, index) => index >= array.length)
+    
+    return [array.join(''), autoSplit(context, remainingText.join(''))].flat()
+  }
+
+  return text
+}
+
+const autoSplitStringArray = (context: CanvasRenderingContext2D, texts: string[]): string[] => {
+  return texts.map((text) => autoSplit(context, text)).flat()
+}
+
 const sortByLength = (texts: string[]) => {
   return [...texts].sort((a, b) => b.length - a.length)
 }
 
 const getMaxLengthText = (texts: string[]) => {
   return sortByLength(texts).find((_text, index) => index === 0)
+}
+
+const checkOverflow = (measurement: TextMetrics) => {
+  return measurement.width > width - paddingWidth
 }
 
 export const AutoLayoutText = () => {
@@ -42,11 +76,11 @@ export const AutoLayoutText = () => {
       context.font = `bold ${fontSize}px sans-serif`
 
       const singleLineMeasurement = context.measureText(text)
-      
-      const possiblyOverflow = singleLineMeasurement.width > width - 200
-      
+      const possiblyOverflow = checkOverflow(singleLineMeasurement)
+
+
       if (possiblyOverflow) {
-        const texts = splitByDelimiter(text, 2)
+        const texts = autoSplitStringArray(context, splitByDelimiter(text, 2))
         const maxLengthText = getMaxLengthText(texts)
 
         if (maxLengthText === undefined) {
@@ -63,11 +97,14 @@ export const AutoLayoutText = () => {
           const offsetY = y + lineHeight * distance
           context.fillText(text, x, offsetY, width)
         })
-      } else {
-        const x = (width - singleLineMeasurement.width) / 2
-        const y = height / 2
-        context.fillText(text, x, y, width)
+
+        return
       }
+
+
+      const x = (width - singleLineMeasurement.width) / 2
+      const y = height / 2
+      context.fillText(text, x, y, width)
     }
   }, [context, text])
 
