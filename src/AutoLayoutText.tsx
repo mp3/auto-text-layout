@@ -7,6 +7,15 @@ const height = 630
 const fontSize = 42
 const lineHeight = fontSize * 1.25
 
+const splitByDelimiter = (text: string, position: number) => {
+  const regexp = new RegExp(`([^，．、。\\s]+[，．、。\s]){${position}}`)
+
+  return text
+    .replace(regexp, '$&\n')
+    .split('\n')
+    .filter((text) => text !== '')
+}
+
 export const AutoLayoutText = () => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
   const [text, setText] = useState<string>('')
@@ -29,10 +38,7 @@ export const AutoLayoutText = () => {
       const possiblyOverflow = singleLineMeasurement.width > width - 200
       
       if (possiblyOverflow) {
-        const texts = text
-          .replace(/([^，．、。\s]+[，．、。\s]){2}/, '$&\n')
-          .split('\n')
-          .filter((text) => text !== '')
+        const texts = splitByDelimiter(text, 2)
 
         const maxLengthText = [...texts]
           .sort((a, b) => b.length - a.length)
