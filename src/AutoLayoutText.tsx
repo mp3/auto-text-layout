@@ -9,7 +9,7 @@ const fontSize = 50
 const lineHeight = fontSize * 1.25
 
 const splitByDelimiter = (text: string, position: number) => {
-  const regexp = new RegExp(`([^，．、。\\s]+[，．、。\s]){${position}}`)
+  const regexp = new RegExp(`([^，．、。\\s]+[，．、。\\s]){${position}}`)
 
   return text
     .replace(regexp, '$&\n')
