@@ -165,5 +165,7 @@ const Text = styled.div``
 
 const Input = styled.input`
   display: block;
+  width: 800px;
+  padding: 4px;
   margin-bottom: 16px;
 `
