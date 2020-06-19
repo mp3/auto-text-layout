@@ -139,7 +139,10 @@ export const AutoLayoutText = () => {
 
   return (
     <Container>
-      <Input onInput={onInputText} autoFocus={true} />
+      <InputContainer>
+        <Text>テキストを入力:　</Text>
+        <Input onInput={onInputText} autoFocus={true} />
+      </InputContainer>
       <Canvas ref={canvasRef} />
     </Container>
   )
@@ -153,6 +156,12 @@ const Canvas = styled.canvas`
   height: 630px;
   border: 1px solid #ccc;
 `
+
+const InputContainer = styled.div`
+  display: flex;
+`
+
+const Text = styled.div``
 
 const Input = styled.input`
   display: block;
