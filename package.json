@@ -1,0 +1,8 @@
+{
+  "name": "auto-text-layout",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:mp3/auto-text-layout.git",
+  "author": "mp3 <im.in.a.coma.xxx@gmail.com>",
+  "license": "MIT"
+}
